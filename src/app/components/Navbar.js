@@ -8,13 +8,12 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Disclosure, Menu } from '@headlessui/react';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { HiMenu, HiX, HiChevronDown, HiChevronUp } from 'react-icons/hi';
 
 const navigation = [
   { name: 'รายการสินค้า', href: '/home' },
   { name: 'บิล', href: '#' },
   { name: 'บิลเสีย', href: '#' },
-  { name: 'ตัวช่วยคีย์', href: '#' },
 ];
 
 function classNames(...classes) {
@@ -24,6 +23,7 @@ function classNames(...classes) {
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -75,6 +75,49 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   ))}
+                  {/* Dropdown Menu for "ตัวช่วยคีย์" */}
+                  {user && 
+                  <Menu as="div" className="relative">
+                    <Menu.Button 
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="text-black-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium flex items-center"
+                    >
+                      ตัวช่วยคีย์
+                      {isDropdownOpen ? <HiChevronUp className="ml-1" /> : <HiChevronDown className="ml-1" />}
+                    </Menu.Button>
+                    <Menu.Items className="absolute z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link href="/helper/utils" className={classNames(
+                            active ? 'bg-gray-100' : '',
+                            'block px-4 py-2 text-sm text-gray-700'
+                          )}>
+                            ชุดรวมเลข
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link href="/helper/lak" className={classNames(
+                            active ? 'bg-gray-100' : '',
+                            'block px-4 py-2 text-sm text-gray-700'
+                          )}>
+                            เลขลาก
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link href="/helper/win" className={classNames(
+                            active ? 'bg-gray-100' : '',
+                            'block px-4 py-2 text-sm text-gray-700'
+                          )}>
+                            เลขวิน
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Menu>}
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">

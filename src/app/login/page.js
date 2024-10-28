@@ -1,13 +1,24 @@
 // src/app/login/page.js
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is already logged in by verifying if the token exists
+    const token = Cookies.get('token');
+    if (token) {
+      // If the token is present, redirect to /home
+      router.push('/home');
+    }
+  }, [router]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +30,7 @@ export default function Login() {
       Cookies.set('token', res.data.token, { expires: 1, secure: true, sameSite: 'Strict' });
       
       // ไปที่หน้า home
-      window.location.href = '/home';
+      window.location.reload()
     } catch (err) {
       setError('Invalid username or password');
     }

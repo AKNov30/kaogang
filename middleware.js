@@ -8,7 +8,12 @@ export async function middleware(req) {
 
   // Redirect to login if no token is present
   if (!token) {
-    if (pathname === '/home' || pathname === '/admin' || pathname === '/register') {
+    if (
+      pathname === '/home' || 
+      pathname === '/admin' || 
+      pathname === '/register'
+    ) 
+    {
       return NextResponse.redirect(new URL('/login', req.url));
     }
   }
@@ -27,7 +32,7 @@ export async function middleware(req) {
 
     // Redirect if attempting to access /register without admin role
     if (pathname === '/register' && payload.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL('/home', req.url));
     }
   } catch (error) {
     // Redirect to login if token verification fails
@@ -38,5 +43,9 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/home', '/admin', '/register'],
+  matcher: [
+    '/home',
+    '/admin',
+    '/register'
+  ],
 };
