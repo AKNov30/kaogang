@@ -11,6 +11,9 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      minHeight: {
+        'screen-with-navbar': 'calc(100vh - 4rem)',
+      },
     },
   },
   plugins: [],

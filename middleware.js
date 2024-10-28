@@ -1,13 +1,12 @@
 // middleware.js
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { jwtVerify } from 'jose';
 
-export function middleware(req) {
+export async function middleware(req) {
   const { pathname } = req.nextUrl;
-
   const token = req.cookies.get('token')?.value;
 
-  // ตรวจสอบว่ามี token หรือไม่ (ถ้าไม่มีจะ redirect ไปที่หน้า login)
+  // Redirect to login if no token is present
   if (!token) {
     if (pathname === '/home' || pathname === '/admin' || pathname === '/register') {
       return NextResponse.redirect(new URL('/login', req.url));
@@ -15,19 +14,23 @@ export function middleware(req) {
   }
 
   try {
-    // ตรวจสอบ token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify the token with Jose
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(process.env.JWT_SECRET)
+    );
 
-    // ถ้าผู้ใช้พยายามเข้าถึงหน้า /admin แต่ role ไม่ใช่ admin จะ redirect ไปที่ /home
-    if (pathname === '/admin' && decoded.role !== 'admin') {
+    // Redirect if attempting to access /admin without admin role
+    if (pathname === '/admin' && payload.role !== 'admin') {
       return NextResponse.redirect(new URL('/home', req.url));
     }
 
-    // ถ้าผู้ใช้พยายามเข้าถึงหน้า /register แต่ role ไม่ใช่ admin จะ redirect ไปที่ /dashboard
-    if (pathname === '/register' && decoded.role !== 'admin') {
+    // Redirect if attempting to access /register without admin role
+    if (pathname === '/register' && payload.role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', req.url));
     }
   } catch (error) {
+    // Redirect to login if token verification fails
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
